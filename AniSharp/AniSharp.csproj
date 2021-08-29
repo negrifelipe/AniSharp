@@ -6,7 +6,7 @@
 
   <PropertyGroup>
     <PackageId>Feli.AniSharp</PackageId>
-    <PackageDescription></PackageDescription>
+    <PackageDescription>A library that makes easier to scrap data from My Anime List </PackageDescription>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageAuthor>Feli</PackageAuthor>
     <PackageProjectUrl>https://github.com/01-Feli/AniSharp</PackageProjectUrl>
