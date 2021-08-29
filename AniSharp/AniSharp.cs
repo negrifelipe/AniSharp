@@ -3,8 +3,9 @@ using HtmlAgilityPack;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
+using AniSharp.Constants;
 using System.Threading.Tasks;
+using System.Globalization;
 
 namespace AniSharp
 {
@@ -58,10 +59,11 @@ namespace AniSharp
         /// Gets a list of animes from the top
         /// </summary>
         /// <param name="startIndex">From where the search will start</param>
+        /// <param name="type">This is optional, you can specify a type to search use <see cref="TopTypes"/> to get the types</param>
         /// <returns>A list with the animes</returns>
-        public static async Task<List<AnimeCard>> GetTopAnimeAsync(int startIndex = 0)
+        public static async Task<List<AnimeCard>> GetTopAnimeAsync(int startIndex = 0, string type = null)
         {
-            var document = await Web.LoadFromWebAsync($"{BasePath}topanime.php?limit={startIndex}");
+            var document = await Web.LoadFromWebAsync($"{BasePath}topanime.php?limit={startIndex}&type={type ?? ""}");
 
             return ParseTopAnime(document);
         }
@@ -110,11 +112,12 @@ namespace AniSharp
         /// Gets a list of animes from the top
         /// </summary>
         /// <param name="startIndex">From where the search will start</param>
+        /// <param name="type">This is optional, you can specify a type to search use <see cref="TopTypes"/> to get the types</param>
         /// <returns>A list with the animes</returns>
-        public static List<AnimeCard> GetTopAnime(int startIndex = 0)
+        public static List<AnimeCard> GetTopAnime(int startIndex = 0, string type = null)
         {
-            var document = Web.Load($"{BasePath}topanime.php?limit={startIndex}");
-
+            var document = Web.Load($"{BasePath}topanime.php?limit={startIndex}&type={type ?? ""}");
+            System.Console.WriteLine($"{BasePath}topanime.php?limit={startIndex}&type={type ?? ""}");
             return ParseTopAnime(document);
         }
 
@@ -234,15 +237,15 @@ namespace AniSharp
 
             foreach(var table in rankingTables)
             {
-                var name = document.DocumentNode.SelectSingleNode(table.XPath + "//td//div//div//h3//a");
-                var score = document.DocumentNode.SelectSingleNode(table.XPath + "//td//div//span");
+                var name = document.DocumentNode.SelectSingleNode(table.XPath + "//td//div//div//h3//a").InnerText;
+                var score = document.DocumentNode.SelectSingleNode(table.XPath + "//td//div//span").InnerText;
                 var image = document.DocumentNode.SelectSingleNode(table.XPath + "//td//a//img").GetAttributeValue("data-src", string.Empty);
                 var url = document.DocumentNode.SelectSingleNode(table.XPath + "//td//a").GetAttributeValue("href", string.Empty);
 
                 cards.Add(new AnimeCard
                 {
                     Name = name,
-                    Score = score,
+                    Score = double.Parse(score, CultureInfo.InvariantCulture),
                     Image = image,
                     Url = url
                 });

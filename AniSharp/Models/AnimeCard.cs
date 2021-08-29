@@ -10,7 +10,7 @@
         /// <summary>
         /// Gets the score of the anime
         /// </summary>
-        public decimal Score { get; set; }
+        public double Score { get; set; }
 
         /// <summary>
         /// Gets the image url of the anime
