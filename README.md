@@ -19,6 +19,12 @@ AniSharp.DisableCache();
 // Gets the anime called Shinmai Maou no Testament (https://myanimelist.net/anime/23233/Shinmai_Maou_no_Testament)
 var anime = AniSharp.GetAnimeFromName("Testament");
 
+// Gets the top of ova
+var ovas = AniSharp.GetTopAnime(type: TopTypes.Ova);
+
+// Gets the default top of anime from the 50
+var animes = AniSharp.GetTopAnime(startIndex: 50);
+
 // You can also get things asynchronously
 var anime = await AniSharp.GetAnimeFromNameAsync("Testament");
 
