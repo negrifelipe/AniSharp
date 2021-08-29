@@ -19,6 +19,9 @@ AniSharp.DisableCache();
 // Gets the anime called Shinmai Maou no Testament (https://myanimelist.net/anime/23233/Shinmai_Maou_no_Testament)
 var anime = AniSharp.GetAnimeFromName("Testament");
 
+// You can also get things asynchronously
+var anime = AniSharp.GetAnimeFromNameAsync("Testament");
+
 // Lets print the anime name and synopsis
 Console.WriteLine(anime.Name);
 Console.WriteLine(anime.Synopsis);
