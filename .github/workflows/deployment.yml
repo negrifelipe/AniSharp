@@ -22,10 +22,10 @@ jobs:
     - name: Install dependencies
       run: dotnet restore
     - name: Update version
-      run: "sed -i \"s#<Version>0.0.0</Version>#<Version>${{ github.event.inputs.version }}</Version>#\" AniSharp/AniSharp/AniSharp.csproj"  
+      run: "sed -i \"s#<Version>0.0.0</Version>#<Version>${{ github.event.inputs.version }}</Version>#\" AniSharp/AniSharp.csproj"  
     - name: Build
-      run: dotnet build AniSharp/AniSharp/AniSharp.csproj --configuration Release --no-restore
+      run: dotnet build AniSharp/AniSharp.csproj --configuration Release --no-restore
     - name: Push to NuGet
-      run: dotnet nuget push AniSharp/AniSharp/bin/Release/*.nupkg
+      run: dotnet nuget push AniSharp/bin/Release/*.nupkg
              --api-key ${{ secrets.NUGET_DEPLOY_KEY }}
              --source https://api.nuget.org/v3/index.json
