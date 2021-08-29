@@ -28,7 +28,7 @@ namespace AniSharp
         }
 
         /// <summary>
-        /// Gets the anme data from the given url
+        /// Gets the anime data from the given url
         /// </summary>
         /// <param name="url">The url from the anime</param>
         /// <returns>The searched anime; Returns null if not found</returns>
@@ -53,13 +53,25 @@ namespace AniSharp
         }
 
         /// <summary>
-        /// Gets the anme data from the given url
+        /// Gets the anime data from the given url
         /// </summary>
         /// <param name="url">The url from the anime</param>
         /// <returns>The searched anime; Returns null if not found</returns>
         public static Anime GetAnimeData(string url)
         {
             var document = new HtmlWeb().Load(url);
+
+            return ParseAnime(document);
+        }
+
+        /// <summary>
+        /// Gets the anime data from the given id
+        /// </summary>
+        /// <param name="id">The id of the anime</param>
+        /// <returns>The searched anime; Returns null if not found</returns>
+        public static Anime GetAnimeFromId(string id)
+        {
+            var document = new HtmlWeb().Load($"{BasePath}anime/{id}");
 
             return ParseAnime(document);
         }
