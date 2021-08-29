@@ -1,5 +1,6 @@
 ﻿using AniSharp.Models;
 using HtmlAgilityPack;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -9,6 +10,8 @@ namespace AniSharp
     {
         public const string BasePath = "https://myanimelist.net/";
 
+        public static HtmlWeb Web = new HtmlWeb();
+
         /// <summary>
         /// Gets the anime data from the given name
         /// </summary>
@@ -16,7 +19,7 @@ namespace AniSharp
         /// <returns>The searched anime; Returns null if not found</returns>
         public static async Task<Anime> GetAnimeFromNameAsync(string name)
         {
-            var document = await new HtmlWeb().LoadFromWebAsync($"{BasePath}anime.php?cat=anime&q={string.Join("+", name.Split(' '))}");
+            var document = await Web.LoadFromWebAsync($"{BasePath}anime.php?cat=anime&q={string.Join("+", name.Split(' '))}");
 
             var content = document.GetElementbyId("content");
             var url = content.SelectNodes("//div//table")[2].SelectSingleNode("//tr//td//a//strong").ParentNode.GetAttributeValue("href", null);
@@ -34,14 +37,26 @@ namespace AniSharp
         /// <returns>The searched anime; Returns null if not found</returns>
         public static async Task<Anime> GetAnimeDataAsync(string url)
         {
-            var document = await new HtmlWeb().LoadFromWebAsync(url);
+            var document = await Web.LoadFromWebAsync(url);
+
+            return ParseAnime(document);
+        }
+
+        /// <summary>
+        /// Gets the anime data from the given id
+        /// </summary>
+        /// <param name="id">The id of the anime</param>
+        /// <returns>The searched anime; Returns null if not found</returns>
+        public static async Task<Anime> GetAnimeFromIdASync(string id)
+        {
+            var document = await Web.LoadFromWebAsync($"{BasePath}anime/{id}");
 
             return ParseAnime(document);
         }
 
         public static Anime GetAnimeFromName(string name)
         {
-            var document = new HtmlWeb().Load($"{BasePath}anime.php?cat=anime&q={string.Join("+", name.Split(' '))}");
+            var document = Web.Load($"{BasePath}anime.php?cat=anime&q={string.Join("+", name.Split(' '))}");
 
             var content = document.GetElementbyId("content");
             var url = content.SelectNodes("//div//table")[2].SelectSingleNode("//tr//td//a//strong").ParentNode.GetAttributeValue("href", null);
@@ -59,7 +74,7 @@ namespace AniSharp
         /// <returns>The searched anime; Returns null if not found</returns>
         public static Anime GetAnimeData(string url)
         {
-            var document = new HtmlWeb().Load(url);
+            var document = Web.Load(url);
 
             return ParseAnime(document);
         }
@@ -71,9 +86,32 @@ namespace AniSharp
         /// <returns>The searched anime; Returns null if not found</returns>
         public static Anime GetAnimeFromId(string id)
         {
-            var document = new HtmlWeb().Load($"{BasePath}anime/{id}");
+            var document = Web.Load($"{BasePath}anime/{id}");
 
             return ParseAnime(document);
+        }
+
+        /// <summary>
+        /// Disables the cache mod
+        /// </summary>
+        public static void DisableCache()
+        {
+            Web.UsingCache = false;
+        }
+
+        /// <summary>
+        /// Enables the cache mode
+        /// </summary>
+        /// <param name="cachePath">The path were the cache files will be located; Leave it as null to use the default one</param>
+        public static void EnableCache(string cachePath = null)
+        {
+            if (cachePath == null)
+                Web.CachePath = Path.Combine(System.Environment.CurrentDirectory, "Cache");
+            else
+                Web.CachePath = cachePath;
+
+            Web.UsingCache = true;
+            Web.UsingCacheIfExists = true;
         }
 
         #region internal
