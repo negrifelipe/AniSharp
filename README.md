@@ -3,7 +3,7 @@
 
 # Installation 
 ```
-dotnet add package AniSharp
+dotnet add package Feli.AniSharp
 ```
 
 # Basic Usage
