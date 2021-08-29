@@ -1,4 +1,7 @@
 <h1 align="center">AniSharp</h1>
+<p align="center">
+  ![NugetDownloads](https://img.shields.io/nuget/dt/Feli.AniSharp?label=Nuget%20Downloads)
+</p>
 <h3 align="center">This library makes easier to get data from my myanimelist.net using web scraping. This doesnt use the mal api so there can be some bugs or problems using it. In my case everything works great. Take in mind that this library is still on development</h3>
 
 # Installation 
