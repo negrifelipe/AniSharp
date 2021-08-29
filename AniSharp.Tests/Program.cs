@@ -41,6 +41,16 @@ namespace AniSharp.Tests
                 Console.WriteLine($"Synopsis: {anime.Synopsis}");
                 Console.WriteLine($"Producers {string.Join(", ", anime.Information.Producers)}");
                 Console.WriteLine($"Genres: {string.Join(", ", anime.Information.Genres)}");
+                Console.WriteLine("Characters: ");
+                foreach(var character in anime.Characters)
+                {
+                    Console.WriteLine("");
+                    Console.WriteLine(character.Name);
+                    Console.WriteLine(character.Type);
+                    Console.WriteLine(character.Image);
+                    Console.WriteLine(character.Page);
+                    Console.WriteLine("");
+                }
                 Console.WriteLine("");
                 Console.WriteLine("-----------------------------------");
                 Console.WriteLine("");

@@ -1,4 +1,6 @@
-﻿namespace AniSharp.Models
+﻿using System.Collections.Generic;
+
+namespace AniSharp.Models
 {
     public class Anime
     {
@@ -26,5 +28,10 @@
         /// Gets the statics on the anime
         /// </summary>
         public AnimeStatics Statics { get; set; }
+
+        /// <summary>
+        /// Gets all the caracters that had taken part of the anime
+        /// </summary>
+        public List<AnimeCharacter> Characters { get; set; }
     }
 }

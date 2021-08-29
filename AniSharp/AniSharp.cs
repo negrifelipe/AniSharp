@@ -1,7 +1,9 @@
 ﻿using AniSharp.Models;
 using HtmlAgilityPack;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace AniSharp
@@ -59,10 +61,8 @@ namespace AniSharp
             var document = Web.Load($"{BasePath}anime.php?cat=anime&q={string.Join("+", name.Split(' '))}");
 
             var content = document.GetElementbyId("content");
-            var url = content.SelectNodes("//div//table")[2].SelectSingleNode("//tr//td//a//strong").ParentNode.GetAttributeValue("href", null);
 
-            if (string.IsNullOrEmpty(url))
-                return null;
+            var url = content.SelectNodes("//div//table")[2].SelectSingleNode("//tr//td//a//strong").ParentNode.GetAttributeValue("href", null);
 
             return GetAnimeData(url);
         }
@@ -129,6 +129,8 @@ namespace AniSharp
             var sideBar = content.SelectSingleNode("//table//tr//td//div//h2").ParentNode;
             var image = sideBar.SelectNodes("//div//a//img")[1].GetAttributeValue("data-src", string.Empty);
 
+            var charactersUrl = content.SelectNodes("//table//tr//div//table//tr//td//div//div//a").FirstOrDefault(x => x.InnerText == "More characters").GetAttributeValue("href", string.Empty);
+
             return new Anime()
             {
                 Name = name,
@@ -155,7 +157,8 @@ namespace AniSharp
                     Rank = sideBar.GetSidebarData("Ranked"),
                     Popularity = sideBar.GetSidebarData("Popularity"),
                     Favorites = sideBar.GetSidebarData("Favorites")
-                }
+                },
+                Characters = GetCaracters($"{BasePath}{charactersUrl}")
             };
         }
 
@@ -165,6 +168,33 @@ namespace AniSharp
             find.RemoveAll(x => string.IsNullOrWhiteSpace(x));
             find.RemoveAt(0);
             return string.Join(" ", find).Trim();
+        }
+
+        internal static List<AnimeCharacter> GetCaracters(string url)
+        {
+            var document = Web.Load(url);
+
+            var nav = document.GetElementbyId("horiznav_nav");
+
+            var staff = document.DocumentNode.SelectNodes(nav.ParentNode.XPath + "//a").FirstOrDefault(x => x.GetAttributeValue("name", string.Empty) == "staff");
+
+            var tables = document.DocumentNode.SelectNodes(nav.ParentNode.XPath + "//table//tr//td//div//small");
+
+            List<AnimeCharacter> characters = new List<AnimeCharacter>();
+
+            foreach(var table in tables.Select(x => x.ParentNode.ParentNode).Where(x => staff.ParentNode.ChildNodes.IndexOf(x.ParentNode.ParentNode) < staff.ParentNode.ChildNodes.IndexOf(staff)))
+            {
+                var nameNode = document.DocumentNode.SelectSingleNode(table.XPath + "//a");
+                characters.Add(new AnimeCharacter()
+                {
+                    Name = nameNode.InnerText.Trim(),
+                    Page = nameNode.GetAttributeValue("href", string.Empty),
+                    Image = document.DocumentNode.SelectSingleNode(table.ParentNode.XPath + "//td//div//a//img").GetAttributeValue("data-src", string.Empty),
+                    Type = document.DocumentNode.SelectSingleNode(table.XPath + "//div//small").InnerText
+                });
+            }
+
+            return characters;
         }
 
         #endregion
