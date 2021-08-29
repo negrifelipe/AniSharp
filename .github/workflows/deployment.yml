@@ -29,3 +29,8 @@ jobs:
       run: dotnet nuget push AniSharp/bin/Release/*.nupkg
              --api-key ${{ secrets.NUGET_DEPLOY_KEY }}
              --source https://api.nuget.org/v3/index.json
+    - name: Push to Github
+      run: dotnet nuget push AniSharp/bin/Release/*.nupkg
+             --api-key ${{ secrets.GITHUB_DEPLOY_KEY }}
+             --source https://nuget.pkg.github.com/01-Feli/index.json
+             --skip-duplicate
