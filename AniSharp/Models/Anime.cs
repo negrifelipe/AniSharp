@@ -5,6 +5,11 @@ namespace AniSharp.Models
     public class Anime
     {
         /// <summary>
+        /// Gets the id of the anime
+        /// </summary>
+        public int Id { get; set; }
+
+        /// <summary>
         /// Gets the anime name
         /// </summary>
         public string Name { get; set; }

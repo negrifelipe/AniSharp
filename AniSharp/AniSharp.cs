@@ -15,6 +15,8 @@ namespace AniSharp
 
         public static HtmlWeb Web = new HtmlWeb();
 
+        #region async
+
         /// <summary>
         /// Gets the anime data from the given name
         /// </summary>
@@ -48,11 +50,9 @@ namespace AniSharp
         /// </summary>
         /// <param name="id">The id of the anime</param>
         /// <returns>The searched anime; Returns null if not found</returns>
-        public static async Task<Anime> GetAnimeFromIdASync(string id)
+        public static Task<Anime> GetAnimeFromIdAsync(int id)
         {
-            var document = await Web.LoadFromWebAsync($"{BasePath}anime/{id}");
-
-            return ParseAnime(document);
+            return GetAnimeDataAsync($"{BasePath}anime/{id}");
         }
 
         /// <summary>
@@ -65,8 +65,24 @@ namespace AniSharp
         {
             var document = await Web.LoadFromWebAsync($"{BasePath}topanime.php?limit={startIndex}&type={type ?? ""}");
 
-            return ParseTopAnime(document);
+            return ParseTopAnimes(document);
         }
+
+        /// <summary>
+        /// Gets the characters of the specified anime
+        /// </summary>
+        /// <param name="id">The id of the anime</param>
+        /// <returns>A list with all the characters of the anime</returns>
+        public static async Task<List<AnimeCharacter>> GetAnimeCharactersAsync(int id)
+        {
+            var anime = await GetAnimeFromIdAsync(id);
+
+            return anime.Characters;
+        }
+
+        #endregion
+
+        #region sync
 
         /// <summary>
         /// Gets the anime data from the given name
@@ -101,11 +117,9 @@ namespace AniSharp
         /// </summary>
         /// <param name="id">The id of the anime</param>
         /// <returns>The searched anime; Returns null if not found</returns>
-        public static Anime GetAnimeFromId(string id)
+        public static Anime GetAnimeFromId(int id)
         {
-            var document = Web.Load($"{BasePath}anime/{id}");
-
-            return ParseAnime(document);
+            return GetAnimeData($"{BasePath}anime/{id}");
         }
 
         /// <summary>
@@ -118,8 +132,24 @@ namespace AniSharp
         {
             var document = Web.Load($"{BasePath}topanime.php?limit={startIndex}&type={type ?? ""}");
 
-            return ParseTopAnime(document);
+            return ParseTopAnimes(document);
         }
+
+        /// <summary>
+        /// Gets the characters of the specified anime
+        /// </summary>
+        /// <param name="id">The id of the anime</param>
+        /// <returns>A list with all the characters of the anime</returns>
+        public static List<AnimeCharacter> GetAnimeCharacters(int id)
+        {
+            var anime = GetAnimeFromId(id);
+
+            return anime.Characters;
+        }
+
+        #endregion
+
+        #region cache
 
         /// <summary>
         /// Disables the cache mod
@@ -144,6 +174,8 @@ namespace AniSharp
             Web.UsingCacheIfExists = true;
         }
 
+        #endregion
+
         #region internal
 
         internal static Anime ParseAnime(HtmlDocument document)
@@ -155,6 +187,7 @@ namespace AniSharp
 
             var content = document.GetElementbyId("content");
 
+            var id = document.GetElementbyId("myinfo_anime_id").GetAttributeValue("value", 0);
             var synopsis = content.SelectSingleNode("//table//tr//div//table//tr//td//p").InnerText;
             var sideBar = content.SelectSingleNode("//table//tr//td//div//h2").ParentNode;
             var image = sideBar.SelectNodes("//div//a//img")[1].GetAttributeValue("data-src", string.Empty);
@@ -163,6 +196,7 @@ namespace AniSharp
 
             return new Anime()
             {
+                Id = id,
                 Name = name,
                 Image = image,
                 Synopsis = synopsis,
@@ -227,7 +261,7 @@ namespace AniSharp
             return characters;
         }
 
-        internal static List<AnimeCard> ParseTopAnime(HtmlDocument document)
+        internal static List<AnimeCard> ParseTopAnimes(HtmlDocument document)
         {
             var content = document.GetElementbyId("content");
 
