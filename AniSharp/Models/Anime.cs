@@ -30,7 +30,7 @@ namespace AniSharp.Models
         public AnimeStatics Statics { get; set; }
 
         /// <summary>
-        /// Gets all the caracters that had taken part of the anime
+        /// Gets all the characters that had taken part of the anime
         /// </summary>
         public List<AnimeCharacter> Characters { get; set; }
     }
