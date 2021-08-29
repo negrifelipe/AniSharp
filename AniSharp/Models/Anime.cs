@@ -20,7 +20,7 @@ namespace AniSharp.Models
         public string Synopsis { get; set; }
 
         /// <summary>
-        /// Gets the anime information
+        /// Gets the anime url information
         /// </summary>
         public AnimeInformation Information { get; set; }
 

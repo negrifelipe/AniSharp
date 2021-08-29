@@ -58,8 +58,8 @@
         public string Duration { get; set; }
 
         /// <summary>
-        /// The rating of anime
+        /// The score of anime
         /// </summary>
-        public string Rating { get; set; }
+        public string Score { get; set; }
     }
 }

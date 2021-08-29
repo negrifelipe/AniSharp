@@ -24,10 +24,8 @@ namespace AniSharp
             var document = await Web.LoadFromWebAsync($"{BasePath}anime.php?cat=anime&q={string.Join("+", name.Split(' '))}");
 
             var content = document.GetElementbyId("content");
-            var url = content.SelectNodes("//div//table")[2].SelectSingleNode("//tr//td//a//strong").ParentNode.GetAttributeValue("href", null);
 
-            if (string.IsNullOrEmpty(url))
-                return null;
+            var url = content.SelectNodes("//div//table")[2].SelectSingleNode("//tr//td//a//strong").ParentNode.GetAttributeValue("href", null);
 
             return await GetAnimeDataAsync(url);
         }
@@ -56,6 +54,23 @@ namespace AniSharp
             return ParseAnime(document);
         }
 
+        /// <summary>
+        /// Gets a list of animes from the top
+        /// </summary>
+        /// <param name="startIndex">From where the search will start</param>
+        /// <returns>A list with the animes</returns>
+        public static async Task<List<AnimeCard>> GetTopAnimeAsync(int startIndex = 0)
+        {
+            var document = await Web.LoadFromWebAsync($"{BasePath}topanime.php?limit={startIndex}");
+
+            return ParseTopAnime(document);
+        }
+
+        /// <summary>
+        /// Gets the anime data from the given name
+        /// </summary>
+        /// <param name="name">The name of the anime</param>
+        /// <returns>The searched anime; Returns null if not found</returns>
         public static Anime GetAnimeFromName(string name)
         {
             var document = Web.Load($"{BasePath}anime.php?cat=anime&q={string.Join("+", name.Split(' '))}");
@@ -89,6 +104,18 @@ namespace AniSharp
             var document = Web.Load($"{BasePath}anime/{id}");
 
             return ParseAnime(document);
+        }
+
+        /// <summary>
+        /// Gets a list of animes from the top
+        /// </summary>
+        /// <param name="startIndex">From where the search will start</param>
+        /// <returns>A list with the animes</returns>
+        public static List<AnimeCard> GetTopAnime(int startIndex = 0)
+        {
+            var document = Web.Load($"{BasePath}topanime.php?limit={startIndex}");
+
+            return ParseTopAnime(document);
         }
 
         /// <summary>
@@ -149,7 +176,7 @@ namespace AniSharp
                     Source = sideBar.GetSidebarData("Source"),
                     Genres = sideBar.GetSidebarData("Genres").Split(',').Select(x => x.Trim()).ToArray(),
                     Duration = sideBar.GetSidebarData("Duration"),
-                    Rating = sideBar.GetSidebarData("Rating")
+                    Score = sideBar.GetSidebarData("Rating")
                 },
                 Statics = new AnimeStatics()
                 {
@@ -195,6 +222,33 @@ namespace AniSharp
             }
 
             return characters;
+        }
+
+        internal static List<AnimeCard> ParseTopAnime(HtmlDocument document)
+        {
+            var content = document.GetElementbyId("content");
+
+            var rankingTables = document.DocumentNode.SelectNodes(content.XPath + "//div//table//tr").Where(x => x.HasClass("ranking-list"));
+
+            List<AnimeCard> cards = new List<AnimeCard>();
+
+            foreach(var table in rankingTables)
+            {
+                var name = document.DocumentNode.SelectSingleNode(table.XPath + "//td//div//div//h3//a");
+                var score = document.DocumentNode.SelectSingleNode(table.XPath + "//td//div//span");
+                var image = document.DocumentNode.SelectSingleNode(table.XPath + "//td//a//img").GetAttributeValue("data-src", string.Empty);
+                var url = document.DocumentNode.SelectSingleNode(table.XPath + "//td//a").GetAttributeValue("href", string.Empty);
+
+                cards.Add(new AnimeCard
+                {
+                    Name = name,
+                    Score = score,
+                    Image = image,
+                    Url = url
+                });
+            }
+
+            return cards;
         }
 
         #endregion
