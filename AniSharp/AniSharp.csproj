@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageId>AniSharp</PackageId>
+    <PackageId>Feli.AniSharp</PackageId>
     <PackageDescription></PackageDescription>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageAuthor>Feli</PackageAuthor>
