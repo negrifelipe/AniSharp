@@ -20,7 +20,7 @@ AniSharp.DisableCache();
 var anime = AniSharp.GetAnimeFromName("Testament");
 
 // You can also get things asynchronously
-var anime = AniSharp.GetAnimeFromNameAsync("Testament");
+var anime = await AniSharp.GetAnimeFromNameAsync("Testament");
 
 // Lets print the anime name and synopsis
 Console.WriteLine(anime.Name);
