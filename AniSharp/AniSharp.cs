@@ -117,7 +117,7 @@ namespace AniSharp
         public static List<AnimeCard> GetTopAnime(int startIndex = 0, string type = null)
         {
             var document = Web.Load($"{BasePath}topanime.php?limit={startIndex}&type={type ?? ""}");
-            System.Console.WriteLine($"{BasePath}topanime.php?limit={startIndex}&type={type ?? ""}");
+
             return ParseTopAnime(document);
         }
 
