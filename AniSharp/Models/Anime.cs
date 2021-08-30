@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using HtmlAgilityPack;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace AniSharp.Models
 {
@@ -13,6 +16,11 @@ namespace AniSharp.Models
         /// Gets the anime name
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// Gets the url of the anime page
+        /// </summary>
+        public string Url { get; set; }
 
         /// <summary>
         /// Gets the image of the anime
@@ -34,9 +42,63 @@ namespace AniSharp.Models
         /// </summary>
         public AnimeStatics Statics { get; set; }
 
+        #region async
+
         /// <summary>
         /// Gets all the characters that had taken part of the anime
         /// </summary>
-        public List<AnimeCharacter> Characters { get; set; }
+        /// <returns></returns>
+        public async Task<List<AnimeCharacter>> GetCharactersAsync()
+        {
+            var document = await AniSharp.Web.LoadFromWebAsync($"{Url}/characters");
+
+            return ParseCaracters(document);
+        }
+
+        #endregion
+
+        #region sync
+
+        /// <summary>
+        /// Gets all the characters that had taken part of the anime
+        /// </summary>
+        /// <returns></returns>
+        public List<AnimeCharacter> GetCharacters()
+        {
+            var document = AniSharp.Web.Load($"{Url}/characters");
+
+            return ParseCaracters(document);
+        }
+
+        #endregion
+
+        #region internal
+
+        internal static List<AnimeCharacter> ParseCaracters(HtmlDocument document)
+        {
+            var nav = document.GetElementbyId("horiznav_nav");
+
+            var staff = document.DocumentNode.SelectNodes(nav.ParentNode.XPath + "//a").FirstOrDefault(x => x.GetAttributeValue("name", string.Empty) == "staff");
+
+            var tables = document.DocumentNode.SelectNodes(nav.ParentNode.XPath + "//table//tr//td//div//small");
+
+            List<AnimeCharacter> characters = new List<AnimeCharacter>();
+
+            foreach (var table in tables.Select(x => x.ParentNode.ParentNode).Where(x => staff.ParentNode.ChildNodes.IndexOf(x.ParentNode.ParentNode) < staff.ParentNode.ChildNodes.IndexOf(staff)))
+            {
+                var nameNode = document.DocumentNode.SelectSingleNode(table.XPath + "//a");
+                characters.Add(new AnimeCharacter()
+                {
+                    Name = nameNode.InnerText.Trim(),
+                    Page = nameNode.GetAttributeValue("href", string.Empty),
+                    Image = document.DocumentNode.SelectSingleNode(table.ParentNode.XPath + "//td//div//a//img").GetAttributeValue("data-src", string.Empty),
+                    Type = document.DocumentNode.SelectSingleNode(table.XPath + "//div//small").InnerText
+                });
+            }
+
+            return characters;
+        }
+
+        #endregion
     }
 }

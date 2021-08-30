@@ -68,18 +68,6 @@ namespace AniSharp
             return ParseTopAnimes(document);
         }
 
-        /// <summary>
-        /// Gets the characters of the specified anime
-        /// </summary>
-        /// <param name="id">The id of the anime</param>
-        /// <returns>A list with all the characters of the anime</returns>
-        public static async Task<List<AnimeCharacter>> GetAnimeCharactersAsync(int id)
-        {
-            var anime = await GetAnimeFromIdAsync(id);
-
-            return anime.Characters;
-        }
-
         #endregion
 
         #region sync
@@ -135,18 +123,6 @@ namespace AniSharp
             return ParseTopAnimes(document);
         }
 
-        /// <summary>
-        /// Gets the characters of the specified anime
-        /// </summary>
-        /// <param name="id">The id of the anime</param>
-        /// <returns>A list with all the characters of the anime</returns>
-        public static List<AnimeCharacter> GetAnimeCharacters(int id)
-        {
-            var anime = GetAnimeFromId(id);
-
-            return anime.Characters;
-        }
-
         #endregion
 
         #region cache
@@ -188,6 +164,7 @@ namespace AniSharp
             var content = document.GetElementbyId("content");
 
             var id = document.GetElementbyId("myinfo_anime_id").GetAttributeValue("value", 0);
+            var url = document.DocumentNode.SelectSingleNode(document.GetElementbyId("horiznav_nav").XPath + "//ul//li//a").InnerText;
             var synopsis = content.SelectSingleNode("//table//tr//div//table//tr//td//p").InnerText;
             var sideBar = content.SelectSingleNode("//table//tr//td//div//h2").ParentNode;
             var image = sideBar.SelectNodes("//div//a//img")[1].GetAttributeValue("data-src", string.Empty);
@@ -199,6 +176,7 @@ namespace AniSharp
                 Id = id,
                 Name = name,
                 Image = image,
+                Url = url,
                 Synopsis = synopsis,
                 Information = new AnimeInformation()
                 {
@@ -221,8 +199,7 @@ namespace AniSharp
                     Rank = sideBar.GetSidebarData("Ranked"),
                     Popularity = sideBar.GetSidebarData("Popularity"),
                     Favorites = sideBar.GetSidebarData("Favorites")
-                },
-                Characters = GetCaracters($"{BasePath}{charactersUrl}")
+                }
             };
         }
 
@@ -232,33 +209,6 @@ namespace AniSharp
             find.RemoveAll(x => string.IsNullOrWhiteSpace(x));
             find.RemoveAt(0);
             return string.Join(" ", find).Trim();
-        }
-
-        internal static List<AnimeCharacter> GetCaracters(string url)
-        {
-            var document = Web.Load(url);
-
-            var nav = document.GetElementbyId("horiznav_nav");
-
-            var staff = document.DocumentNode.SelectNodes(nav.ParentNode.XPath + "//a").FirstOrDefault(x => x.GetAttributeValue("name", string.Empty) == "staff");
-
-            var tables = document.DocumentNode.SelectNodes(nav.ParentNode.XPath + "//table//tr//td//div//small");
-
-            List<AnimeCharacter> characters = new List<AnimeCharacter>();
-
-            foreach(var table in tables.Select(x => x.ParentNode.ParentNode).Where(x => staff.ParentNode.ChildNodes.IndexOf(x.ParentNode.ParentNode) < staff.ParentNode.ChildNodes.IndexOf(staff)))
-            {
-                var nameNode = document.DocumentNode.SelectSingleNode(table.XPath + "//a");
-                characters.Add(new AnimeCharacter()
-                {
-                    Name = nameNode.InnerText.Trim(),
-                    Page = nameNode.GetAttributeValue("href", string.Empty),
-                    Image = document.DocumentNode.SelectSingleNode(table.ParentNode.XPath + "//td//div//a//img").GetAttributeValue("data-src", string.Empty),
-                    Type = document.DocumentNode.SelectSingleNode(table.XPath + "//div//small").InnerText
-                });
-            }
-
-            return characters;
         }
 
         internal static List<AnimeCard> ParseTopAnimes(HtmlDocument document)

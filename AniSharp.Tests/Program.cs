@@ -36,6 +36,7 @@ namespace AniSharp.Tests
                 Console.WriteLine($"Getting the data took: {watch.Elapsed.TotalSeconds}");
                 Console.WriteLine("");
                 Console.WriteLine($"Id: {anime.Id}");
+                Console.WriteLine($"Url: {anime.Url}");
                 Console.WriteLine($"Name: {anime.Name}");
                 Console.WriteLine($"Synopsis: {anime.Synopsis}");
                 Console.WriteLine($"Producers {string.Join(", ", anime.Information.Producers)}");
