@@ -24,7 +24,19 @@ namespace AniSharp
         /// <returns>The searched anime; Returns null if not found</returns>
         public static async Task<Anime> GetAnimeFromNameAsync(string name)
         {
+            // We need to make sure this request is not from the cache
+
+            bool usedCache = false;
+
+            if (Web.UsingCache)
+            {
+                usedCache = true;
+                Web.UsingCache = false;
+            }
+
             var document = await Web.LoadFromWebAsync($"{BasePath}anime.php?cat=anime&q={string.Join("+", name.Split(' '))}");
+
+            Web.UsingCache = usedCache;
 
             var content = document.GetElementbyId("content");
 
@@ -79,7 +91,19 @@ namespace AniSharp
         /// <returns>The searched anime; Returns null if not found</returns>
         public static Anime GetAnimeFromName(string name)
         {
+            // We need to make sure this request is not from the cache
+
+            bool usedCache = false;
+
+            if(Web.UsingCache)
+            {
+                usedCache = true;
+                Web.UsingCache = false;
+            }
+
             var document = Web.Load($"{BasePath}anime.php?cat=anime&q={string.Join("+", name.Split(' '))}");
+
+            Web.UsingCache = usedCache;
 
             var content = document.GetElementbyId("content");
 
