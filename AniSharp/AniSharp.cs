@@ -164,7 +164,7 @@ namespace AniSharp
             var content = document.GetElementbyId("content");
 
             var id = document.GetElementbyId("myinfo_anime_id").GetAttributeValue("value", 0);
-            var url = document.DocumentNode.SelectSingleNode(document.GetElementbyId("horiznav_nav").XPath + "//ul//li//a").InnerText;
+            var url = document.DocumentNode.SelectSingleNode(document.GetElementbyId("horiznav_nav").XPath + "//ul//a").GetAttributeValue("href", string.Empty);
             var synopsis = content.SelectSingleNode("//table//tr//div//table//tr//td//p").InnerText;
             var sideBar = content.SelectSingleNode("//table//tr//td//div//h2").ParentNode;
             var image = sideBar.SelectNodes("//div//a//img")[1].GetAttributeValue("data-src", string.Empty);

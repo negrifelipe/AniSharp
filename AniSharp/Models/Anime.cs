@@ -55,6 +55,17 @@ namespace AniSharp.Models
             return ParseCaracters(document);
         }
 
+        /// <summary>
+        /// Gets all the pictures of the anime from the pictures section
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<string>> GetPicturesAsync()
+        {
+            var document = await AniSharp.Web.LoadFromWebAsync($"{Url}/pics");
+
+            return ParsePictures(document);
+        }
+
         #endregion
 
         #region sync
@@ -70,11 +81,22 @@ namespace AniSharp.Models
             return ParseCaracters(document);
         }
 
+        /// <summary>
+        /// Gets all the pictures of the anime from the pictures section
+        /// </summary>
+        /// <returns></returns>
+        public List<string> GetPictures()
+        {
+            var document = AniSharp.Web.Load($"{Url}/pics");
+
+            return ParsePictures(document);
+        }
+
         #endregion
 
         #region internal
 
-        internal static List<AnimeCharacter> ParseCaracters(HtmlDocument document)
+        internal List<AnimeCharacter> ParseCaracters(HtmlDocument document)
         {
             var nav = document.GetElementbyId("horiznav_nav");
 
@@ -97,6 +119,13 @@ namespace AniSharp.Models
             }
 
             return characters;
+        }
+
+        internal List<string> ParsePictures(HtmlDocument document)
+        {
+            var container = document.GetElementbyId("horiznav_nav").ParentNode;
+
+            return document.DocumentNode.SelectNodes(container.XPath + "//table//tr//td//div//a//img").Select(x => x.GetAttributeValue("data-src", string.Empty)).ToList();
         }
 
         #endregion
