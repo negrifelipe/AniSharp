@@ -228,6 +228,8 @@ namespace AniSharp
                 Synopsis = synopsis,
                 Information = new AnimeInformation()
                 {
+                    EnglishName = sideBar.GetSidebarData("English"),
+                    JapaneseName = sideBar.GetSidebarData("Japanese"),
                     Episodes = int.Parse(sideBar.GetSidebarData("Episodes")),
                     Status = sideBar.GetSidebarData("Status"),
                     Aired = sideBar.GetSidebarData("Aired"),
@@ -253,7 +255,12 @@ namespace AniSharp
 
         internal static string GetSidebarData(this HtmlNode node, string data)
         {
-            var find =  node.SelectNodes("//div//span").FirstOrDefault(x => x.InnerText == data + ":").ParentNode.InnerText.Split(' ').ToList();
+            var select = node.SelectNodes(node.XPath + "//div//span").FirstOrDefault(x => x.InnerText == data + ":");
+
+            if (select == null)
+                return string.Empty;
+
+            var find = select.ParentNode.InnerText.Split(' ').ToList();
             find.RemoveAll(x => string.IsNullOrWhiteSpace(x));
             find.RemoveAt(0);
             return string.Join(" ", find).Trim();

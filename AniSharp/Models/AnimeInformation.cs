@@ -3,6 +3,16 @@
     public class AnimeInformation
     {
         /// <summary>
+        /// Gets the anime name in japanese; Can be empty
+        /// </summary>
+        public string JapaneseName { get; set; }
+
+        /// <summary>
+        /// Gets the anime name in english; Can be empty
+        /// </summary>
+        public string EnglishName { get; set; }
+
+        /// <summary>
         /// Gets the amount of episodes
         /// </summary>
         public int Episodes { get; set; }

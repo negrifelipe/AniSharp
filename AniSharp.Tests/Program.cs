@@ -38,6 +38,8 @@ namespace AniSharp.Tests
                 Console.WriteLine($"Id: {anime.Id}");
                 Console.WriteLine($"Url: {anime.Url}");
                 Console.WriteLine($"Name: {anime.Name}");
+                Console.WriteLine($"English Name: {anime.Information.EnglishName}");
+                Console.WriteLine($"Japanse Name: {anime.Information.JapaneseName}");
                 Console.WriteLine($"Synopsis: {anime.Synopsis}");
                 Console.WriteLine($"Producers {string.Join(", ", anime.Information.Producers)}");
                 Console.WriteLine($"Genres: {string.Join(", ", anime.Information.Genres)}");
