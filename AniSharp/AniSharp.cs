@@ -75,7 +75,19 @@ namespace AniSharp
         /// <returns>A list with the animes</returns>
         public static async Task<List<AnimeCard>> GetTopAnimeAsync(int startIndex = 0, string type = null)
         {
+            // We need to make sure this request is not from the cache
+
+            bool usedCache = false;
+
+            if (Web.UsingCache)
+            {
+                usedCache = true;
+                Web.UsingCache = false;
+            }
+
             var document = await Web.LoadFromWebAsync($"{BasePath}topanime.php?limit={startIndex}&type={type ?? ""}");
+
+            Web.UsingCache = usedCache;
 
             return ParseTopAnimes(document);
         }
@@ -142,7 +154,19 @@ namespace AniSharp
         /// <returns>A list with the animes</returns>
         public static List<AnimeCard> GetTopAnime(int startIndex = 0, string type = null)
         {
+            // We need to make sure this request is not from the cache
+
+            bool usedCache = false;
+
+            if (Web.UsingCache)
+            {
+                usedCache = true;
+                Web.UsingCache = false;
+            }
+
             var document = Web.Load($"{BasePath}topanime.php?limit={startIndex}&type={type ?? ""}");
+
+            Web.UsingCache = usedCache;
 
             return ParseTopAnimes(document);
         }
