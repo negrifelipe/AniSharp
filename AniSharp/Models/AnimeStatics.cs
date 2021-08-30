@@ -5,12 +5,12 @@
         /// <summary>
         /// The average score
         /// </summary>
-        public string Score { get; set; }
+        public float Score { get; set; }
 
         /// <summary>
         /// The current rank of the anime
         /// </summary>
-        public string Rank { get; set; }
+        public int Rank { get; set; }
 
         /// <summary>
         /// The rank of popularity

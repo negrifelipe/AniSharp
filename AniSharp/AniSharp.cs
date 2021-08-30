@@ -6,6 +6,7 @@ using System.Linq;
 using AniSharp.Constants;
 using System.Threading.Tasks;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 
 namespace AniSharp
 {
@@ -245,8 +246,8 @@ namespace AniSharp
                 },
                 Statics = new AnimeStatics()
                 {
-                    Score = sideBar.GetSidebarData("Score"),
-                    Rank = sideBar.GetSidebarData("Ranked"),
+                    Score = float.Parse(sideBar.GetSidebarData("Score").Split(' ')[0], CultureInfo.InvariantCulture),
+                    Rank = int.Parse(sideBar.GetSidebarData("Ranked").Remove('#').Split(' ')[0].Trim().Replace("#", string.Empty)),
                     Popularity = sideBar.GetSidebarData("Popularity"),
                     Favorites = sideBar.GetSidebarData("Favorites")
                 }
