@@ -100,8 +100,20 @@ namespace AniSharp
         /// <returns>The character</returns>
         public static async Task<Character> GetCharacterFromNameAsync(string name)
         {
+            // We need to make sure this request is not from the cache
+
+            bool usedCache = false;
+
+            if (Web.UsingCache)
+            {
+                usedCache = true;
+                Web.UsingCache = false;
+            }
+
             var document = await Web.LoadFromWebAsync($"{BasePath}character.php?q={name}");
 
+            Web.UsingCache = usedCache;
+            
             return await GetCharacterFromUrlAsync(ParseCharacterUrl(document));
         }
 
@@ -213,7 +225,19 @@ namespace AniSharp
         /// <returns>The character</returns>
         public static Character GetCharacterFromName(string name)
         {
+            // We need to make sure this request is not from the cache
+
+            bool usedCache = false;
+
+            if (Web.UsingCache)
+            {
+                usedCache = true;
+                Web.UsingCache = false;
+            }
+
             var document = Web.Load($"{BasePath}character.php?q={name}");
+
+            Web.UsingCache = usedCache;
 
             return GetCharacterFromUrl(ParseCharacterUrl(document));
         }
