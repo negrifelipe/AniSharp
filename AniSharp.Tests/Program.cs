@@ -56,8 +56,9 @@ namespace AniSharp.Tests
 
                 foreach(var character in anime.GetCharacters())
                 {
-                    Console.WriteLine("===");
                     Console.WriteLine(character.Name);
+                    Console.WriteLine("");
+                    Console.WriteLine(character.Description);
                     Console.WriteLine("===");
                 }
                 

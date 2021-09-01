@@ -7,6 +7,7 @@ using AniSharp.Constants;
 using System.Threading.Tasks;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System;
 
 namespace AniSharp
 {
@@ -292,6 +293,27 @@ namespace AniSharp
             }
 
             return cards;
+        }
+
+        internal static Character ParseCharacter(HtmlDocument document)
+        {
+            var contentWrapper = document.GetElementbyId("contentWrapper");
+            var contentTable = document.GetElementbyId("horiznav_nav").ParentNode;
+
+            var name = document.DocumentNode.SelectSingleNode(contentWrapper.XPath + "//div//div//h1//strong").InnerText;
+            var url = document.DocumentNode.SelectNodes(contentTable.XPath + "//div//div//a//span").Select(x => x.ParentNode).ToList()[2].GetAttributeValue("href", string.Empty);
+            var description = string.Join(Environment.NewLine, contentTable.ChildNodes.Where(x => x.Name == "#text" && !string.IsNullOrWhiteSpace(x.InnerText)).Select(x => x.InnerText.Trim())).Trim();
+            var type = document.DocumentNode.SelectSingleNode(document.GetElementbyId("profileRows").ParentNode.XPath + "//table//tr//td//div//small").InnerHtml;
+            var image = document.DocumentNode.SelectSingleNode(document.GetElementbyId("content").XPath + "//table//tr//td//div//a//img").GetAttributeValue("data-src", string.Empty);
+
+            return new Character
+            {
+                Name = name.Trim(),
+                Description = description.Trim(),
+                Image = image,
+                Page = url,
+                Type = type.Trim()
+            };
         }
 
         #endregion
