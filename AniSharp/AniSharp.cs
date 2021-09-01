@@ -94,6 +94,40 @@ namespace AniSharp
             return ParseTopAnimes(document);
         }
 
+        /// <summary>
+        /// Gets a character from a specified name
+        /// </summary>
+        /// <param name="name">The name of the character</param>
+        /// <returns>The character</returns>
+        public static async Task<Character> GetCharacterFromNameAsync(string name)
+        {
+            var document = await Web.LoadFromWebAsync($"{BasePath}character.php?q={name}");
+
+            return await GetCharacterFromUrlAsync(ParseCharacterUrl(document));
+        }
+
+        /// <summary>
+        /// Gets a character from a specified id
+        /// </summary>
+        /// <param name="id">The id of the character</param>
+        /// <returns>The character</returns>
+        public static Task<Character> GetCharacterFromIdAsync(int id)
+        {
+            return GetCharacterFromUrlAsync($"{BasePath}character/{id}");
+        }
+
+        /// <summary>
+        /// Gets a character from a specified url
+        /// </summary>
+        /// <param name="url">The url of the character</param>
+        /// <returns>The character</returns>
+        public static async Task<Character> GetCharacterFromUrlAsync(string url)
+        {
+            var document = await Web.LoadFromWebAsync(url);
+
+            return ParseCharacter(document);
+        }
+
         #endregion
 
         #region sync
@@ -173,6 +207,40 @@ namespace AniSharp
             return ParseTopAnimes(document);
         }
 
+        /// <summary>
+        /// Gets a character from a specified name
+        /// </summary>
+        /// <param name="name">The name of the character</param>
+        /// <returns>The character</returns>
+        public static Character GetCharacterFromName(string name)
+        {
+            var document = Web.Load($"{BasePath}character.php?q={name}");
+
+            return GetCharacterFromUrl(ParseCharacterUrl(document));
+        }
+
+        /// <summary>
+        /// Gets a character from a specified id
+        /// </summary>
+        /// <param name="id">The id of the character</param>
+        /// <returns>The character</returns>
+        public static Character GetCharacterFromId(int id)
+        {
+            return GetCharacterFromUrl($"{BasePath}character/{id}");
+        }
+
+        /// <summary>
+        /// Gets a character from a specified url
+        /// </summary>
+        /// <param name="url">The url of the character</param>
+        /// <returns>The character</returns>
+        public static Character GetCharacterFromUrl(string url)
+        {
+            var document = Web.Load(url);
+
+            return ParseCharacter(document);
+        }
+
         #endregion
 
         #region cache
@@ -203,6 +271,13 @@ namespace AniSharp
         #endregion
 
         #region internal
+
+        internal static string ParseCharacterUrl(HtmlDocument document)
+        {
+            var content = document.GetElementbyId("content");
+
+            return document.DocumentNode.SelectNodes(content.XPath + "//table//tr//td//a")[1].GetAttributeValue("href", string.Empty);
+        }
 
         internal static Anime ParseAnime(HtmlDocument document)
         {
