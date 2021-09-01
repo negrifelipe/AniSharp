@@ -46,14 +46,6 @@ namespace AniSharp.Tests
                 Console.WriteLine($"Producers {string.Join(", ", anime.Information.Producers)}");
                 Console.WriteLine($"Genres: {string.Join(", ", anime.Information.Genres)}");
                 Console.WriteLine("");
-
-                foreach(var picture in anime.GetPictures())
-                {
-                    Console.WriteLine("===");
-                    Console.WriteLine(picture);
-                    Console.WriteLine("===");
-                }
-                
                 Console.WriteLine("-----------------------------------");
                 Console.WriteLine("");
             }
