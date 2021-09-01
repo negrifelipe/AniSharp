@@ -15,7 +15,7 @@ namespace AniSharp.Tests
 
                 bool cache = false;
 
-                if (!bool.TryParse(Console.ReadLine(), out cache))
+                if(!bool.TryParse(Console.ReadLine(), out cache))
                 {
                     Console.WriteLine("Could not parse the value");
                     Console.WriteLine("Setting to false...");
@@ -46,14 +46,6 @@ namespace AniSharp.Tests
                 Console.WriteLine($"Producers {string.Join(", ", anime.Information.Producers)}");
                 Console.WriteLine($"Genres: {string.Join(", ", anime.Information.Genres)}");
                 Console.WriteLine("");
-
-                foreach (var picture in anime.GetPictures())
-                {
-                    Console.WriteLine("===");
-                    Console.WriteLine(picture);
-                    Console.WriteLine("===");
-                }
-
                 Console.WriteLine("-----------------------------------");
                 Console.WriteLine("");
             }
