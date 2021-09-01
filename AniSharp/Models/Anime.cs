@@ -45,9 +45,9 @@ namespace AniSharp.Models
         #region async
 
         /// <summary>
-        /// Gets all the characters that had taken part of the anime
+        /// Gets all the characters that had taken part of the anime; This takes a lot of time use <see cref="GetCharacterCardsAsync"/>
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A collection with the characters</returns>
         public async Task<List<Character>> GetCharactersAsync()
         {
             var document = await AniSharp.Web.LoadFromWebAsync($"{Url}/characters");
@@ -61,6 +61,17 @@ namespace AniSharp.Models
             }
 
             return characters;
+        }
+
+        /// <summary>
+        /// Gets all the characters that had taken part of the anime; Takes less time and its better than <see cref="GetCharactersAsync"/>
+        /// </summary>
+        /// <returns>A collection with the characters</returns>
+        public async Task<List<CharacterCard>> GetCharacterCardsAsync()
+        {
+            var document = await AniSharp.Web.LoadFromWebAsync($"{Url}/characters");
+
+            return ParseCharacterCards(document);
         }
 
         /// <summary>
@@ -79,9 +90,9 @@ namespace AniSharp.Models
         #region sync
 
         /// <summary>
-        /// Gets all the characters that had taken part of the anime
+        /// Gets all the characters that had taken part of the anime; This takes a lot of time use <see cref="GetCharacterCardsAsync"/>
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A collection with the characters</returns>
         public List<Character> GetCharacters()
         {
             var document = AniSharp.Web.Load($"{Url}/characters");
@@ -94,6 +105,17 @@ namespace AniSharp.Models
             }
 
             return characters;
+        }
+
+        /// <summary>
+        /// Gets all the characters that had taken part of the anime; Takes less time and its better than <see cref="GetCharacters"/>
+        /// </summary>
+        /// <returns>A collection with the characters</returns>
+        public List<CharacterCard> GetCharacterCards()
+        {
+            var document = AniSharp.Web.Load($"{Url}/characters");
+
+            return ParseCharacterCards(document);
         }
 
         /// <summary>
@@ -110,6 +132,31 @@ namespace AniSharp.Models
         #endregion
 
         #region internal
+
+        internal List<CharacterCard> ParseCharacterCards(HtmlDocument document)
+        {
+            var nav = document.GetElementbyId("horiznav_nav");
+
+            var staff = document.DocumentNode.SelectNodes(nav.ParentNode.XPath + "//a").FirstOrDefault(x => x.GetAttributeValue("name", string.Empty) == "staff");
+
+            var tables = document.DocumentNode.SelectNodes(nav.ParentNode.XPath + "//table//tr//td//div//small");
+
+            List<CharacterCard> characters = new List<CharacterCard>();
+
+            foreach (var table in tables.Select(x => x.ParentNode.ParentNode).Where(x => staff.ParentNode.ChildNodes.IndexOf(x.ParentNode.ParentNode) < staff.ParentNode.ChildNodes.IndexOf(staff)))
+            {
+                var nameNode = document.DocumentNode.SelectSingleNode(table.XPath + "//a");
+                characters.Add(new CharacterCard()
+                {
+                    Name = nameNode.InnerText.Trim(),
+                    Page = nameNode.GetAttributeValue("href", string.Empty),
+                    Image = document.DocumentNode.SelectSingleNode(table.ParentNode.XPath + "//td//div//a//img").GetAttributeValue("data-src", string.Empty),
+                    Type = document.DocumentNode.SelectSingleNode(table.XPath + "//div//small").InnerText
+                });
+            }
+
+            return characters;
+        }
 
         internal List<string> ParseCaracters(HtmlDocument document)
         {
