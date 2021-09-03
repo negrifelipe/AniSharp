@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace AniSharp.Models
 {
-    public abstract class DetailsPage
+    public class DetailsPage
     {
         /// <summary>
         /// Gets the id
