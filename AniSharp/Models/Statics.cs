@@ -1,6 +1,6 @@
 ﻿namespace AniSharp.Models
 {
-    public class AnimeStatics
+    public class Statics
     {
         /// <summary>
         /// The average score
@@ -8,7 +8,7 @@
         public float Score { get; set; }
 
         /// <summary>
-        /// The current rank of the anime
+        /// The current rank
         /// </summary>
         public int Rank { get; set; }
 

@@ -1,24 +1,24 @@
 ﻿namespace AniSharp.Models
 {
-    public class AnimeCard
+    public class Card
     {
         /// <summary>
-        /// Gets the anime name
+        /// Gets the name
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// Gets the score of the anime
+        /// Gets the score
         /// </summary>
         public double Score { get; set; }
 
         /// <summary>
-        /// Gets the image url of the anime
+        /// Gets the image url
         /// </summary>
         public string Image { get; set; }
 
         /// <summary>
-        /// Gets the url of the anime page that contains more data
+        /// Gets the url of the page that contains more data
         /// </summary>
         public string Url { get; set; }
     }

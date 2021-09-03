@@ -74,7 +74,7 @@ namespace AniSharp
         /// <param name="startIndex">From where the search will start</param>
         /// <param name="type">This is optional, you can specify a type to search use <see cref="TopTypes"/> to get the types</param>
         /// <returns>A list with the animes</returns>
-        public static async Task<List<AnimeCard>> GetTopAnimeAsync(int startIndex = 0, string type = null)
+        public static async Task<List<Card>> GetTopAnimeAsync(int startIndex = 0, string type = null)
         {
             // We need to make sure this request is not from the cache
 
@@ -199,7 +199,7 @@ namespace AniSharp
         /// <param name="startIndex">From where the search will start</param>
         /// <param name="type">This is optional, you can specify a type to search use <see cref="TopTypes"/> to get the types</param>
         /// <returns>A list with the animes</returns>
-        public static List<AnimeCard> GetTopAnime(int startIndex = 0, string type = null)
+        public static List<Card> GetTopAnime(int startIndex = 0, string type = null)
         {
             // We need to make sure this request is not from the cache
 
@@ -343,7 +343,7 @@ namespace AniSharp
                     Duration = sideBar.GetSidebarData("Duration"),
                     Score = sideBar.GetSidebarData("Rating")
                 },
-                Statics = new AnimeStatics()
+                Statics = new Statics()
                 {
                     Score = float.Parse(sideBar.GetSidebarData("Score").Split(' ')[0], CultureInfo.InvariantCulture),
                     Rank = int.Parse(sideBar.GetSidebarData("Ranked").Remove('#').Split(' ')[0].Trim().Replace("#", string.Empty)),
@@ -366,13 +366,13 @@ namespace AniSharp
             return string.Join(" ", find).Trim();
         }
 
-        internal static List<AnimeCard> ParseTopAnimes(HtmlDocument document)
+        internal static List<Card> ParseTopAnimes(HtmlDocument document)
         {
             var content = document.GetElementbyId("content");
 
             var rankingTables = document.DocumentNode.SelectNodes(content.XPath + "//div//table//tr").Where(x => x.HasClass("ranking-list"));
 
-            List<AnimeCard> cards = new List<AnimeCard>();
+            List<Card> cards = new List<Card>();
 
             foreach(var table in rankingTables)
             {
@@ -381,7 +381,7 @@ namespace AniSharp
                 var image = document.DocumentNode.SelectSingleNode(table.XPath + "//td//a//img").GetAttributeValue("data-src", string.Empty);
                 var url = document.DocumentNode.SelectSingleNode(table.XPath + "//td//a").GetAttributeValue("href", string.Empty);
 
-                cards.Add(new AnimeCard
+                cards.Add(new Card
                 {
                     Name = name,
                     Score = double.Parse(score, CultureInfo.InvariantCulture),
