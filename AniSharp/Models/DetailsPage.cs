@@ -28,7 +28,7 @@ namespace AniSharp.Models
         public string Image { get; set; }
 
         /// <summary>
-        /// Gets the sypnopsis
+        /// Gets the synopsis
         /// </summary>
         public string Synopsis { get; set; }
 
@@ -36,6 +36,25 @@ namespace AniSharp.Models
         /// Gets the statics
         /// </summary>
         public Statics Statics { get; set; }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="DetailsPage"/>
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="name"></param>
+        /// <param name="url"></param>
+        /// <param name="image"></param>
+        /// <param name="synopsis"></param>
+        /// <param name="statics"></param>
+        public DetailsPage(int id, string name, string url, string image, string synopsis, Statics statics)
+        {
+            Id = id;
+            Name = name;
+            Url = url;
+            Image = image;
+            Synopsis = synopsis;
+            Statics = statics;
+        }
 
         #region async
 

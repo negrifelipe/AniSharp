@@ -55,7 +55,7 @@ namespace AniSharp
         {
             var document = await Web.LoadFromWebAsync(url);
 
-            return ParseAnime(document);
+            return ParseDetails(document, true) as Anime;
         }
 
         /// <summary>
@@ -179,8 +179,7 @@ namespace AniSharp
         public static Anime GetAnimeData(string url)
         {
             var document = Web.Load(url);
-
-            return ParseAnime(document);
+            return ParseDetails(document, true) as Anime;
         }
 
         /// <summary>
@@ -302,7 +301,7 @@ namespace AniSharp
             return document.DocumentNode.SelectNodes(content.XPath + "//table//tr//td//a")[1].GetAttributeValue("href", string.Empty);
         }
 
-        internal static Anime ParseAnime(HtmlDocument document)
+        internal static DetailsPage ParseDetails(HtmlDocument document, bool isAnime)
         {
             var name = document.GetElementbyId("contentWrapper").SelectSingleNode("//div//div//div//div//h1").InnerText;
 
@@ -318,15 +317,19 @@ namespace AniSharp
             var image = sideBar.SelectNodes("//div//a//img")[1].GetAttributeValue("data-src", string.Empty);
 
             var charactersUrl = content.SelectNodes("//table//tr//div//table//tr//td//div//div//a").FirstOrDefault(x => x.InnerText == "More characters").GetAttributeValue("href", string.Empty);
-
-            return new Anime()
+            
+            var statics = new Statics()
             {
-                Id = id,
-                Name = name,
-                Image = image,
-                Url = url,
-                Synopsis = synopsis,
-                Information = new AnimeInformation()
+                Score = float.Parse(sideBar.GetSidebarData("Score").Split(' ')[0], CultureInfo.InvariantCulture),
+                Rank = int.Parse(sideBar.GetSidebarData("Ranked").Remove('#').Split(' ')[0].Trim().Replace("#", string.Empty)),
+                Popularity = sideBar.GetSidebarData("Popularity"),
+                Favorites = sideBar.GetSidebarData("Favorites")
+            };
+
+
+            if(isAnime)
+            {
+                var information = new AnimeInformation()
                 {
                     EnglishName = sideBar.GetSidebarData("English"),
                     JapaneseName = sideBar.GetSidebarData("Japanese"),
@@ -342,15 +345,12 @@ namespace AniSharp
                     Genres = sideBar.GetSidebarData("Genres").Split(',').Select(x => x.Trim()).ToArray(),
                     Duration = sideBar.GetSidebarData("Duration"),
                     Score = sideBar.GetSidebarData("Rating")
-                },
-                Statics = new Statics()
-                {
-                    Score = float.Parse(sideBar.GetSidebarData("Score").Split(' ')[0], CultureInfo.InvariantCulture),
-                    Rank = int.Parse(sideBar.GetSidebarData("Ranked").Remove('#').Split(' ')[0].Trim().Replace("#", string.Empty)),
-                    Popularity = sideBar.GetSidebarData("Popularity"),
-                    Favorites = sideBar.GetSidebarData("Favorites")
-                }
-            };
+                };
+
+                return new Anime(id, name, url, image, synopsis, statics, information);
+            }
+
+            return null;
         }
 
         internal static string GetSidebarData(this HtmlNode node, string data)
