@@ -24,6 +24,9 @@ AniSharp.DisableCache();
 // Gets the anime called Shinmai Maou no Testament (https://myanimelist.net/anime/23233/Shinmai_Maou_no_Testament)
 var anime = AniSharp.GetAnimeFromName("Testament");
 
+// Gets the manga called Metamorphosis (https://myanimelist.net/manga/65981/Henshin)
+var manga = AniSharp.GetMangaFromName("Henshin");
+
 // Gets the top of ova
 var ovas = AniSharp.GetTopAnime(type: TopTypes.Ova);
 
