@@ -87,7 +87,7 @@ namespace AniSharp
                 Web.UsingCache = false;
             }
 
-            var document = await iWeb.LoadFromWebAsync($"{BasePath}manga.php?cat=manga&q={string.Join("+", name.Split(' '))}");
+            var document = await Web.LoadFromWebAsync($"{BasePath}manga.php?cat=manga&q={string.Join("+", name.Split(' '))}");
 
             Web.UsingCache = usedCache;
 
