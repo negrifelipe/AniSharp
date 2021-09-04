@@ -1,9 +1,9 @@
 ﻿namespace AniSharp.Models
 {
-    public class Anime : DetailsPage
+    public class Manga : DetailsPage
     {
         /// <summary>
-        /// Creates a new instance of <see cref="Anime"/>
+        /// Creates a new instance of <see cref="Manga"/>
         /// </summary>
         /// <param name="id"></param>
         /// <param name="name"></param>
@@ -11,8 +11,7 @@
         /// <param name="image"></param>
         /// <param name="synopsis"></param>
         /// <param name="statics"></param>
-        /// <param name="information"></param>
-        public Anime(int id, string name, string url, string image, string synopsis, Statics statics, AnimeInformation information) : base(id, name, url, image, synopsis, statics)
+        public Manga(int id, string name, string url, string image, string synopsis, Statics statics, MangaInformation information) : base(id, name, url, image, synopsis, statics)
         {
             Id = id;
             Name = name;
@@ -24,8 +23,8 @@
         }
 
         /// <summary>
-        /// Gets the anime extra information
+        /// Gets the manga extra information
         /// </summary>
-        public AnimeInformation Information { get; set; }
+        public MangaInformation Information { get; set; }
     }
 }

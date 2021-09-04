@@ -7,6 +7,7 @@ using AniSharp.Constants;
 using System.Threading.Tasks;
 using System.Globalization;
 using System;
+using System.Security.Cryptography;
 
 namespace AniSharp
 {
@@ -67,6 +68,57 @@ namespace AniSharp
         {
             return GetAnimeDataAsync($"{BasePath}anime/{id}");
         }
+
+
+        /// <summary>
+        /// Gets the manga data from the given name
+        /// </summary>
+        /// <param name="name">The name of the manga</param>
+        /// <returns>The searched manga; Returns null if not found</returns>
+        public static async Task<Manga> GetMangaFromNameAsync(string name)
+        {
+            // We need to make sure this request is not from the cache
+
+            bool usedCache = false;
+
+            if (Web.UsingCache)
+            {
+                usedCache = true;
+                Web.UsingCache = false;
+            }
+
+            var document = await iWeb.LoadFromWebAsync($"{BasePath}manga.php?cat=manga&q={string.Join("+", name.Split(' '))}");
+
+            Web.UsingCache = usedCache;
+
+            var content = document.GetElementbyId("content");
+
+            var url = content.SelectNodes("//div//table")[2].SelectSingleNode("//tr//td//a//strong").ParentNode.GetAttributeValue("href", null);
+
+            return await GetMangaDataAsync(url);
+        }
+
+        /// <summary>
+        /// Gets the manga data from the given url
+        /// </summary>
+        /// <param name="url">The url from the manga</param>
+        /// <returns>The searched manga; Returns null if not found</returns>
+        public static async Task<Manga> GetMangaDataAsync(string url)
+        {
+            var document = await Web.LoadFromWebAsync(url);
+            return ParseDetails(document, false) as Manga;
+        }
+
+        /// <summary>
+        /// Gets the manga data from the given id
+        /// </summary>
+        /// <param name="id">The id of the manga</param>
+        /// <returns>The searched manga; Returns null if not found</returns>
+        public static Task<Manga> GetMangaFromIdAsync(int id)
+        {
+            return GetMangaDataAsync($"{BasePath}anime/{id}");
+        }
+
 
         /// <summary>
         /// Gets a list of animes from the top
@@ -193,6 +245,55 @@ namespace AniSharp
         }
 
         /// <summary>
+        /// Gets the manga data from the given name
+        /// </summary>
+        /// <param name="name">The name of the manga</param>
+        /// <returns>The searched manga; Returns null if not found</returns>
+        public static Manga GetMangaFromName(string name)
+        {
+            // We need to make sure this request is not from the cache
+
+            bool usedCache = false;
+
+            if (Web.UsingCache)
+            {
+                usedCache = true;
+                Web.UsingCache = false;
+            }
+
+            var document = Web.Load($"{BasePath}manga.php?cat=manga&q={string.Join("+", name.Split(' '))}");
+
+            Web.UsingCache = usedCache;
+
+            var content = document.GetElementbyId("content");
+
+            var url = content.SelectNodes("//div//table")[2].SelectSingleNode("//tr//td//a//strong").ParentNode.GetAttributeValue("href", null);
+
+            return GetMangaData(url);
+        }
+
+        /// <summary>
+        /// Gets the manga data from the given url
+        /// </summary>
+        /// <param name="url">The url from the manga</param>
+        /// <returns>The searched manga; Returns null if not found</returns>
+        public static Manga GetMangaData(string url)
+        {
+            var document = Web.Load(url);
+            return ParseDetails(document, false) as Manga;
+        }
+
+        /// <summary>
+        /// Gets the manga data from the given id
+        /// </summary>
+        /// <param name="id">The id of the manga</param>
+        /// <returns>The searched manga; Returns null if not found</returns>
+        public static Manga GetMangaFromId(int id)
+        {
+            return GetMangaData($"{BasePath}anime/{id}");
+        }
+
+        /// <summary>
         /// Gets a list of animes from the top
         /// </summary>
         /// <param name="startIndex">From where the search will start</param>
@@ -303,7 +404,11 @@ namespace AniSharp
 
         internal static DetailsPage ParseDetails(HtmlDocument document, bool isAnime)
         {
-            var name = document.GetElementbyId("contentWrapper").SelectSingleNode("//div//div//div//div//h1").InnerText;
+            string name = string.Empty;
+            if (isAnime)
+                name = document.GetElementbyId("contentWrapper").SelectSingleNode("//div//div//div//div//h1").InnerText;
+            else
+                name = document.GetElementbyId("contentWrapper").SelectSingleNode("//div//div//div//div//h1//span//span").GetDirectInnerText();
 
             if (name == null) 
                 return null;
@@ -312,22 +417,34 @@ namespace AniSharp
 
             var id = document.GetElementbyId("myinfo_anime_id").GetAttributeValue("value", 0);
             var url = document.DocumentNode.SelectSingleNode(document.GetElementbyId("horiznav_nav").XPath + "//ul//a").GetAttributeValue("href", string.Empty);
-            var synopsis = content.SelectSingleNode("//table//tr//div//table//tr//td//p").InnerText;
+
+            string synopsis = string.Empty;
+
+            if (isAnime)
+                synopsis = document.DocumentNode.SelectSingleNode(content.XPath + "//table//tr//div//table//tr//td//p").InnerText;
+            else
+                synopsis = document.DocumentNode.SelectNodes(content.XPath + "//table//tr//div//table//tr//td//span").FirstOrDefault(x => x.GetAttributeValue("itemprop", string.Empty) != string.Empty).InnerText;
+
             var sideBar = content.SelectSingleNode("//table//tr//td//div//h2").ParentNode;
             var image = sideBar.SelectNodes("//div//a//img")[1].GetAttributeValue("data-src", string.Empty);
 
-            var charactersUrl = content.SelectNodes("//table//tr//div//table//tr//td//div//div//a").FirstOrDefault(x => x.InnerText == "More characters").GetAttributeValue("href", string.Empty);
-            
+            var charactersUrl = document.DocumentNode.SelectNodes(document.GetElementbyId("horiznav_nav").XPath + "//ul//a").FirstOrDefault(x => x.InnerText.Contains("Characters")).GetAttributeValue("href", string.Empty);
+
+            var rank = sideBar.GetSidebarData("Ranked").Remove('#').Split(' ')[0].Trim().Replace("#", string.Empty);
+
+            if (rank.Contains("N/A"))
+                rank = "0";
+
             var statics = new Statics()
             {
                 Score = float.Parse(sideBar.GetSidebarData("Score").Split(' ')[0], CultureInfo.InvariantCulture),
-                Rank = int.Parse(sideBar.GetSidebarData("Ranked").Remove('#').Split(' ')[0].Trim().Replace("#", string.Empty)),
+                Rank = int.Parse(rank),
                 Popularity = sideBar.GetSidebarData("Popularity"),
                 Favorites = sideBar.GetSidebarData("Favorites")
             };
 
 
-            if(isAnime)
+            if (isAnime)
             {
                 var information = new AnimeInformation()
                 {
@@ -349,8 +466,38 @@ namespace AniSharp
 
                 return new Anime(id, name, url, image, synopsis, statics, information);
             }
+            else
+            {
 
-            return null;
+                if (!url.Contains("myanimelist"))
+                    url = BasePath + url;
+
+                var volumes = 0;
+                var chapters = 0;
+
+                var volumesData = sideBar.GetSidebarData("Volumes");
+                if (!volumesData.Contains("Unknown"))
+                    volumes = int.Parse(volumesData);
+
+                var chaptersData = sideBar.GetSidebarData("Chapters");
+                if (!chaptersData.Contains("Unknown"))
+                    chapters = int.Parse(chaptersData);
+
+                var information = new MangaInformation()
+                {
+                    EnglishName = sideBar.GetSidebarData("English"),
+                    JapaneseName = sideBar.GetSidebarData("Japanese"),
+                    Status = sideBar.GetSidebarData("Status"),
+                    Published = sideBar.GetSidebarData("Published"),
+                    Authors = sideBar.GetSidebarData("Authors").Split(',').Select(x => x.Trim()).ToArray(),
+                    Chapters = chapters,
+                    Genres = sideBar.GetSidebarData("Genres").Split(',').Select(x => x.Trim()).ToArray(),
+                    Volumes = volumes,
+                    Serialization = sideBar.GetSidebarData("Serialization")
+                };
+
+                return new Manga(id, name, url, image, synopsis, statics, information);
+            }
         }
 
         internal static string GetSidebarData(this HtmlNode node, string data)

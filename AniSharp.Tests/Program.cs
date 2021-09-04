@@ -9,7 +9,7 @@ namespace AniSharp.Tests
         {
             while (true)
             {
-                Console.WriteLine("Enter the anime you want to search");
+                Console.WriteLine("Enter the name you want to search");
                 var name = Console.ReadLine();
                 Console.WriteLine("Cache mode? true or false");
 
@@ -28,7 +28,7 @@ namespace AniSharp.Tests
 
                 Stopwatch watch = new Stopwatch();
                 watch.Start();
-                var anime = AniSharp.GetAnimeFromName(name);
+                var anime = AniSharp.GetMangaFromName(name);
                 watch.Stop();
                 Console.WriteLine("");
                 Console.WriteLine("-----------------------------------");
@@ -43,7 +43,6 @@ namespace AniSharp.Tests
                 Console.WriteLine($"Rank: {anime.Statics.Rank}");
                 Console.WriteLine($"Score: {anime.Statics.Score}");
                 Console.WriteLine($"Synopsis: {anime.Synopsis}");
-                Console.WriteLine($"Producers {string.Join(", ", anime.Information.Producers)}");
                 Console.WriteLine($"Genres: {string.Join(", ", anime.Information.Genres)}");
                 Console.WriteLine("");
 

@@ -157,16 +157,33 @@ namespace AniSharp.Models
 
             List<CharacterCard> characters = new List<CharacterCard>();
 
-            foreach (var table in tables.Select(x => x.ParentNode.ParentNode).Where(x => staff.ParentNode.ChildNodes.IndexOf(x.ParentNode.ParentNode) < staff.ParentNode.ChildNodes.IndexOf(staff)))
+            if(staff != null)
             {
-                var nameNode = document.DocumentNode.SelectSingleNode(table.XPath + "//a");
-                characters.Add(new CharacterCard()
+                foreach (var table in tables.Select(x => x.ParentNode.ParentNode).Where(x => staff.ParentNode.ChildNodes.IndexOf(x.ParentNode.ParentNode) < staff.ParentNode.ChildNodes.IndexOf(staff)))
                 {
-                    Name = nameNode.InnerText.Trim(),
-                    Page = nameNode.GetAttributeValue("href", string.Empty),
-                    Image = document.DocumentNode.SelectSingleNode(table.ParentNode.XPath + "//td//div//a//img").GetAttributeValue("data-src", string.Empty),
-                    Type = document.DocumentNode.SelectSingleNode(table.XPath + "//div//small").InnerText
-                });
+                    var nameNode = document.DocumentNode.SelectSingleNode(table.XPath + "//a");
+                    characters.Add(new CharacterCard()
+                    {
+                        Name = nameNode.InnerText.Trim(),
+                        Page = nameNode.GetAttributeValue("href", string.Empty),
+                        Image = document.DocumentNode.SelectSingleNode(table.ParentNode.XPath + "//td//div//a//img").GetAttributeValue("data-src", string.Empty),
+                        Type = document.DocumentNode.SelectSingleNode(table.XPath + "//div//small").InnerText
+                    });
+                }
+            }
+            else
+            {
+                foreach(var table in tables.Select(x => x.ParentNode.ParentNode))
+                {
+                    var nameNode = document.DocumentNode.SelectSingleNode(table.XPath + "//a");
+                    characters.Add(new CharacterCard()
+                    {
+                        Name = nameNode.InnerText.Trim(),
+                        Page = nameNode.GetAttributeValue("href", string.Empty),
+                        Image = document.DocumentNode.SelectSingleNode(table.ParentNode.XPath + "//td//div//a//img").GetAttributeValue("data-src", string.Empty),
+                        Type = document.DocumentNode.SelectSingleNode(table.XPath + "//div//small").InnerText
+                    });
+                }
             }
 
             return characters;

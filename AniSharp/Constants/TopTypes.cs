@@ -2,6 +2,7 @@
 {
     public static class TopTypes
     {
+        #region anime
         public const string Airing = "airing";
 
         public const string Upcoming = "upcoming";
@@ -19,5 +20,7 @@
         public const string ByPopularity = "bypopularity";
 
         public const string Favorite = "favorite";
+
+        #endregion
     }
 }
